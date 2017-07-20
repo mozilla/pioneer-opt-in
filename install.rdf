@@ -6,8 +6,12 @@
     <em:bootstrap>true</em:bootstrap>
     <em:unpack>false</em:unpack>
     <em:version>1.0.0</em:version>
-    <em:name>Pioneer Opt-in</em:name>
-    <em:description>Something something Pioneer</em:description>
+    <em:name>Firefox Pioneer</em:name>
+    <em:description>Pioneer is an opt-in program that allows collection of richer data from Firefox.
+
+Pioneers are willing to contribute sensitive data to help make Firefox better. Once you have opted into the group or installed the add-on, you'll be included in studies about how you use the browser. Some of these studies will be passive and simply listen. Others may alter the behavior of your browser a little bit to see if it improves how you browse the web. Others may occasionally ask a question to help us understand how you’re interacting with a page.
+
+To learn more about Pioneer, see https://medium.com/@tobyelliott/10c82d0f9301
     <em:multiprocessCompatible>true</em:multiprocessCompatible>
     <em:targetApplication>
       <Description>
