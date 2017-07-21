@@ -1,2 +1,1 @@
-install.rdf
-bootstrap.js
+manifest.json
