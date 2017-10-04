@@ -1,20 +1,33 @@
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 --[[
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# Pioneer Opt-in Enrollment
+[CEP][] plugin that estimates the number of users who have the Pioneer Opt-in
+add-on installed per-day.
 
-A script for counting Pioneer opt-in enrollment via Hindsight.
-See https://docs.telemetry.mozilla.org/concepts/data_pipeline.html#hindsight
-for details.
+[CEP]: https://docs.telemetry.mozilla.org/concepts/data_pipeline.html#hindsight
 
-Sample config:
-
+## Sample Configuration
+```lua
 filename = 'pioneer_opt_in_estimates.lua'
 message_matcher = 'Type=="telemetry" && Fields[docType]=="main"'
 preserve_data = true
 ticker_interval = 60
+```
 
-]]
+## Sample Output
+Keys are the date in `YEARMONTHDAY` format, values are the estimated number of
+users who sent a ping that included the Pioneer add-on that day.
+```json
+{
+  "20171001": 4523,
+  "20171002": 5937,
+  "20171003": 3002
+}
+```
+--]]
 require "cjson"
 require "hyperloglog"
 require "string"
@@ -30,10 +43,12 @@ function process_message()
 
   if string.find(addonJson, "pioneer-opt-in@mozilla.org", 1, true) ~= nil then
     local day = read_message("Fields[submissionDate]")
-    if not pioneer_day_hlls[day] then
-      pioneer_day_hlls[day] = hyperloglog.new()
+    local hll = pioneer_day_hlls[day]
+    if not hll then
+      hll = hyperloglog.new()
+      pioneer_day_hlls[day] = hll
     end
-    pioneer_day_hlls[day]:add(read_message("Fields[clientId]"))
+    hll:add(read_message("Fields[clientId]"))
   end
 
   return 0
@@ -51,6 +66,6 @@ function timer_event()
   end
   inject_payload("json", "pioneer_opt_in_count", cjson.encode(pioneer_day_counts))
   if count > 30 then
-    table.remove(pioneer_day_hlls, earliest_day)
+    pioneer_day_hlls[earliest_day] = nil
   end
 end
